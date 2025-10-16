@@ -1,0 +1,6 @@
+[submodule "nvim"]
+	path = nvim
+	url = https://github.com/mxksm/nvim.git
+[submodule "sioyek"]
+	path = sioyek
+	url = https://github.com/mxksm/sioyek.git
