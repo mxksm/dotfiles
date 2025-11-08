@@ -59,3 +59,6 @@ yabai -m rule --add app="^Notes$" manage=off
 yabai -m rule --add app="^python3$" manage=off
 yabai -m rule --add app="^Clock$" manage=off
 yabai -m rule --add app="^Find My$" manage=off
+yabai -m rule --add app="^Maps$" manage=off
+yabai -m rule --add app="^FaceTime$" manage=off
+yabai -m rule --add app="^Weather$" manage=off
