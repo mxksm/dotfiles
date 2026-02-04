@@ -62,3 +62,9 @@ yabai -m rule --add app="^Maps$" manage=off
 yabai -m rule --add app="^FaceTime$" manage=off
 yabai -m rule --add app="^Weather$" manage=off
 yabai -m rule --add app="^Finder$" manage=off
+yabai -m rule --add app="^Dictionary$" manage=off
+
+
+# re-apply on space change or yabai restart
+yabai -m signal --add event=space_changed action="~/.config/yabai/place.sh"
+
