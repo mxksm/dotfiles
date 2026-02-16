@@ -64,8 +64,7 @@ yabai -m rule --add app="^Weather$" manage=off
 yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Dictionary$" manage=off
 yabai -m rule --add app="^Headspace$" manage=off
+yabai -m rule --add app="^Raycast$" manage=off
 
-
-# re-apply on space change or yabai restart
-yabai -m signal --add event=space_changed action="~/.config/yabai/place.sh"
-
+yabai -m signal --add event=window_resized app="sioyek" \
+  action='/bin/bash /Users/maksim/.config/yabai/sioyek_resize.sh'

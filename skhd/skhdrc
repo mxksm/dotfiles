@@ -24,11 +24,11 @@ shift + alt - m : yabai -m window --toggle zoom-fullscreen
 # balance out tree of windows (resize to occupy same area)
 shift + alt - e : yabai -m space --balance
 
-# -- Moving Windows Around --
-
 # move window to display left and right
-shift + alt - s : yabai -m window --display west; yabai -m display --focus west;
-shift + alt - g : yabai -m window --display east; yabai -m display --focus east;
+shift + alt - s : ~/.config/skhd/iterm-resize.sh 0.52
+shift + alt - d : ~/.config/skhd/iterm-resize.sh 0.4
+
+# -- Moving Windows Around --
 
 # move window to prev and next space
 shift + alt - p : yabai -m window --space prev;
