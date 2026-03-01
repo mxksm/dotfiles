@@ -23,42 +23,46 @@ tolerance_x=15
 tolerance_y=45
 
 case "$dir" in
-  east)
+  l)
     win_right=$(echo "$win_x + $win_w" | bc)
     disp_right=$(echo "$disp_x + $disp_w" | bc)
     if (( $(echo "$win_right >= $disp_right - $tolerance_x" | bc -l) )); then
-      # At east edge, swap left
-      yabai -m window --swap west
+      # focused window on the right
+      yabai -m window --resize left:50:0 
+    else
+      yabai -m window --resize right:50:0 
     fi
-    yabai -m window --focus east
     ;;
-  west)
-    if (( $(echo "$win_x <= $disp_x + $tolerance_x" | bc -l) )); then
-      # At west edge, swap right
-      yabai -m window --swap east
+  h)
+    if (($(echo "$win_x <= $disp_x + $tolerance_x" | bc -l) )); then
+      # focused window on the left
+      yabai -m window --resize right:-50:0 
+    else
+      yabai -m window --resize left:-50:0 
     fi
-    yabai -m window --focus west
     ;;
-  north)
+  j)
     if (( $(echo "$win_y <= $disp_y + $tolerance_y" | bc -l) )); then
-      # At north edge, swap south
-      echo "here"
-      yabai -m window --swap south
+      # focused window at the bottom
+      yabai -m window --resize bottom:0:50
+    else
+      # focused window at the top
+      yabai -m window --resize top:0:50
     fi
-    yabai -m window --focus north
     ;;
-  south)
+  k)
     win_bottom=$(echo "$win_y + $win_h" | bc)
     disp_bottom=$(echo "$disp_y + $disp_h" | bc)
     if (( $(echo "$win_bottom >= $disp_bottom - $tolerance_y" | bc -l) )); then
-      # At south edge, swap north
-      yabai -m window --swap north
+      # focused window at the bottom
+      yabai -m window --resize top:0:-50
+    else
+      # focused window at the top
+      yabai -m window --resize bottom:0:-50
     fi
-    yabai -m window --focus south
     ;;
   *)
     echo "Unknown direction: $dir"
     exit 1
     ;;
 esac
-
