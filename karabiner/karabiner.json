@@ -5,6 +5,40 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Change right_command to dollar sign, and shift+right_command to tilde (global)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_command",
+                                    "modifiers": {
+                                        "mandatory": ["shift"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "grave_accent_and_tilde",
+                                        "modifiers": ["shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "right_command",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "4",
+                                        "modifiers": ["shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Ctrl (CapsLock) + letter outputs double letter",
                         "enabled": false,
                         "manipulators": [
@@ -298,6 +332,7 @@
                     },
                     {
                         "description": "Change right_command to dollar sign, and shift+right_command to tilde in iTerm",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
