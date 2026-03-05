@@ -5,6 +5,20 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Right Option acts as forward delete",
+                        "enabled": false,
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_option",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "delete_forward" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Change right_command to dollar sign, and shift+right_command to tilde (global)",
                         "manipulators": [
                             {
