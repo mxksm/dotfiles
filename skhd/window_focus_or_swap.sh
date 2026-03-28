@@ -3,6 +3,7 @@
 # where direction is one of: east, west, north, south
 
 dir="$1"
+swap="$2"
 
 # Get current window frame (requires jq)
 window=$(yabai -m query --windows --window)
@@ -26,21 +27,21 @@ case "$dir" in
   east)
     win_right=$(echo "$win_x + $win_w" | bc)
     disp_right=$(echo "$disp_x + $disp_w" | bc)
-    if (( $(echo "$win_right >= $disp_right - $tolerance_x" | bc -l) )); then
+    if (( $(echo "$win_right >= $disp_right - $tolerance_x" | bc -l) )) && [[ "$swap" == "true" ]]; then
       # At east edge, swap left
       yabai -m window --swap west
     fi
     yabai -m window --focus east
     ;;
   west)
-    if (( $(echo "$win_x <= $disp_x + $tolerance_x" | bc -l) )); then
+    if (( $(echo "$win_x <= $disp_x + $tolerance_x" | bc -l) )) && [[ "$swap" == "true" ]]; then
       # At west edge, swap right
       yabai -m window --swap east
     fi
     yabai -m window --focus west
     ;;
   north)
-    if (( $(echo "$win_y <= $disp_y + $tolerance_y" | bc -l) )); then
+    if (( $(echo "$win_y <= $disp_y + $tolerance_y" | bc -l) )) && [[ "$swap" == "true" ]]; then
       # At north edge, swap south
       echo "here"
       yabai -m window --swap south
@@ -50,7 +51,7 @@ case "$dir" in
   south)
     win_bottom=$(echo "$win_y + $win_h" | bc)
     disp_bottom=$(echo "$disp_y + $disp_h" | bc)
-    if (( $(echo "$win_bottom >= $disp_bottom - $tolerance_y" | bc -l) )); then
+    if (( $(echo "$win_bottom >= $disp_bottom - $tolerance_y" | bc -l) )) && [[ "$swap" == "true" ]]; then
       # At south edge, swap north
       yabai -m window --swap north
     fi
