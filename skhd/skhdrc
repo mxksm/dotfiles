@@ -33,10 +33,15 @@ ctrl + alt - s : yabai --start-service
 ctrl + alt - r : yabai --restart-service
 
 # -- Window Focus or Swap --
-alt - l : ~/.config/skhd/window_focus_or_swap.sh east
-alt - h : ~/.config/skhd/window_focus_or_swap.sh west 
-alt - j : ~/.config/skhd/window_focus_or_swap.sh south
-alt - k : ~/.config/skhd/window_focus_or_swap.sh north
+alt - l : ~/.config/skhd/window_focus_or_swap.sh east false
+alt - h : ~/.config/skhd/window_focus_or_swap.sh west  false
+alt - j : ~/.config/skhd/window_focus_or_swap.sh south false
+alt - k : ~/.config/skhd/window_focus_or_swap.sh north false
+
+ctrl + alt - l : ~/.config/skhd/window_focus_or_swap.sh east true
+ctrl + alt - h : ~/.config/skhd/window_focus_or_swap.sh west true 
+ctrl + alt - j : ~/.config/skhd/window_focus_or_swap.sh south true 
+ctrl + alt - k : ~/.config/skhd/window_focus_or_swap.sh north true 
 
 # Increase window width
 shift + alt - l: ~/.config/skhd/window_resize.sh l
@@ -44,6 +49,6 @@ shift + alt - h: ~/.config/skhd/window_resize.sh h
 shift + alt - j: ~/.config/skhd/window_resize.sh j
 shift + alt - k: ~/.config/skhd/window_resize.sh k
 
-# resize iterm to 
-shift + alt - s : ~/.config/skhd/iterm_resize.sh 0.52
-shift + alt - d : ~/.config/skhd/iterm_resize.sh 0.4
+# resize term to 
+shift + alt - s : ~/.config/skhd/term_resize.sh 0.5
+shift + alt - d : ~/.config/skhd/term_resize.sh 0.4

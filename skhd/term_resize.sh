@@ -2,10 +2,10 @@
 
 TARGET_FRACTION=$1
 
-# find an iTerm2 window (pick the first one)
-WINDOW_ID=$(yabai -m query --windows | jq -r '.[] | select(.app=="iTerm2") | .id' | head -n 1)
+# find an kitty window (pick the first one)
+WINDOW_ID=$(yabai -m query --windows | jq -r '.[] | select(.app=="kitty") | .id' | head -n 1)
 
-# if no iTerm2 window exists, exit quietly
+# if no kitty window exists, exit quietly
 [ -z "$WINDOW_ID" ] && exit 0
 
 # get window info
