@@ -50,5 +50,5 @@ shift + alt - j: ~/.config/skhd/window_resize.sh j
 shift + alt - k: ~/.config/skhd/window_resize.sh k
 
 # resize term to 
-shift + alt - s : ~/.config/skhd/term_resize.sh 0.5
-shift + alt - d : ~/.config/skhd/term_resize.sh 0.4
+shift + alt - s : ~/.config/skhd/term_resize.sh 0.774
+shift + alt - d : ~/.config/skhd/term_resize.sh 1.0
