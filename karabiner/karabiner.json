@@ -5,14 +5,32 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "Right Option acts as delete (backspace)",
+                        "description": "Press F5 to type f a f f a g f d",
+                        "enabled": false,
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "p",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    { "key_code": "f" },
+                                    { "key_code": "a" },
+                                    { "key_code": "f" }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Right Option acts as backslash",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "right_option",
                                     "modifiers": { "optional": ["any"] }
                                 },
-                                "to": [{ "key_code": "delete_or_backspace" }],
+                                "to": [{ "key_code": "backslash" }],
                                 "type": "basic"
                             }
                         ]
