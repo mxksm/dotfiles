@@ -39,7 +39,7 @@ yabai -m rule --add app="^Sitcky Notepad$"     manage=off
 yabai -m rule --add app="^mpv$"                manage=off
 yabai -m rule --add app="^Messages$"           manage=off
 yabai -m rule --add app="^Notes$"              manage=off
-yabai -m rule --add app="^python3$"            manage=off
+#yabai -m rule --add app="^python3$"            manage=off
 yabai -m rule --add app="^Clock$"              manage=off
 yabai -m rule --add app="^Find My$"            manage=off
 yabai -m rule --add app="^Maps$"               manage=off
@@ -49,8 +49,9 @@ yabai -m rule --add app="^Finder$"             manage=off
 yabai -m rule --add app="^Dictionary$"         manage=off
 yabai -m rule --add app="^Headspace$"          manage=off
 yabai -m rule --add app="^Raycast$"            manage=off
-yabai -m rule --add app="^Python$"             manage=off
+#yabai -m rule --add app="^Python$"             manage=off
 yabai -m rule --add app="^Cisco Secure Client$"             manage=off
+yabai -m rule --add app="^MoodistMac$"            manage=off
 
 yabai -m signal --add event=window_resized app="sioyek" \
   action='/bin/bash /Users/maksim/.config/yabai/sioyek_resize.sh'
