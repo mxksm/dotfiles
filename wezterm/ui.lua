@@ -10,8 +10,10 @@ return function(config)
   config.hide_tab_bar_if_only_one_tab = true
 
   config.window_padding = {
-    top = 10,
+    top    = 10,
     bottom = 10,
+    left   = 10,
+    left   = 10,
   }
 
   -- Remove default window closing confirmation
