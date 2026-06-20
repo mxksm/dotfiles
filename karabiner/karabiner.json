@@ -5,19 +5,23 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "Press F5 to type f a f f a g f d",
+                        "description": "System-wide Mouse Buttons to F18 and F19",
                         "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "p",
-                                    "modifiers": { "optional": ["any"] }
+                                    "modifiers": { "optional": ["any"] },
+                                    "pointing_button": "button4"
                                 },
-                                "to": [
-                                    { "key_code": "f" },
-                                    { "key_code": "a" },
-                                    { "key_code": "f" }
-                                ],
+                                "to": [{ "key_code": "f18" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "modifiers": { "optional": ["any"] },
+                                    "pointing_button": "button5"
+                                },
+                                "to": [{ "key_code": "f19" }],
                                 "type": "basic"
                             }
                         ]
