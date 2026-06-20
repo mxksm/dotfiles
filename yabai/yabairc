@@ -15,7 +15,7 @@ yabai -m config window_placement second_child
 
 # global settings
 yabai -m config mouse_follows_focus          on
-yabai -m config focus_follows_mouse          autoraise
+#yabai -m config focus_follows_mouse          autoraise
 
 # float system preferences
 yabai -m rule --add app="^System Settings$"    manage=off
@@ -52,6 +52,8 @@ yabai -m rule --add app="^Raycast$"            manage=off
 #yabai -m rule --add app="^Python$"             manage=off
 yabai -m rule --add app="^Cisco Secure Client$"             manage=off
 yabai -m rule --add app="^MoodistMac$"            manage=off
+yabai -m rule --add app="^App Store$"            manage=off
+yabai -m rule --add app="^Connection Matrix Workbench$"            manage=off
 
 yabai -m signal --add event=window_resized app="sioyek" \
   action='/bin/bash /Users/maksim/.config/yabai/sioyek_resize.sh'
