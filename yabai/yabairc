@@ -60,11 +60,15 @@ yabai -m signal --add event=window_resized app="sioyek" \
 
 yabai -m rule --add app="sioyek" role="AXWindow" subrole="AXDialog" manage=on
 
-#borders active_color=0xff7f98a3 inactive_color=0xff494d64 width=3 blacklist="sioyek,kitty" &
+yabai -m query --windows |
+  jq -r '.[] | select(.app == "sioyek") | .id' |
+  xargs -I{} yabai -m window {} --opacity 0.8
 
-# Trigger dynamic gaps script on window and space events
-#yabai -m signal --add event=window_created action="~/.config/yabai/dynamic_gaps.sh"
-#yabai -m signal --add event=window_destroyed action="~/.config/yabai/dynamic_gaps.sh"
-#yabai -m signal --add event=window_minimized action="~/.config/yabai/dynamic_gaps.sh"
-#yabai -m signal --add event=window_deminimized action="~/.config/yabai/dynamic_gaps.sh"
-#yabai -m signal --add event=space_changed action="~/.config/yabai/dynamic_gaps.sh"
+yabai -m query --windows |
+  jq -r '.[] | select(.app == "WezTerm") | .id' |
+  xargs -I{} yabai -m window {} --opacity 0.8
+
+yabai -m query --windows |
+  jq -r '.[] | select(.app == "Firefox") | .id' |
+  xargs -I{} yabai -m window {} --opacity 0.8
+
