@@ -7,7 +7,7 @@ local keys = require 'keys'
 local setup_ui = require 'ui'
 
 -- Set the default startup theme (Tokyo Night x Dracula Mashup)
-config.colors = themes.tokyo_dracula
+config.colors = themes.monokai
 config.keys = keys
 
 setup_ui(config)
