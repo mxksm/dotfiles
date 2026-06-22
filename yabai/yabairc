@@ -1,5 +1,7 @@
-sudo yabai --load-sa
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo -n /opt/homebrew/bin/yabai --load-sa
+
+yabai -m signal --add event=dock_did_restart \
+  action="sudo -n /opt/homebrew/bin/yabai --load-sa"
 
 # bsp or float (default: bsp)
 yabai -m config layout bsp
@@ -39,7 +41,7 @@ yabai -m rule --add app="^Sitcky Notepad$"     manage=off
 yabai -m rule --add app="^mpv$"                manage=off
 yabai -m rule --add app="^Messages$"           manage=off
 yabai -m rule --add app="^Notes$"              manage=off
-#yabai -m rule --add app="^python3$"            manage=off
+#yabai -m rule --add app="^python3$"           manage=off
 yabai -m rule --add app="^Clock$"              manage=off
 yabai -m rule --add app="^Find My$"            manage=off
 yabai -m rule --add app="^Maps$"               manage=off
@@ -55,20 +57,27 @@ yabai -m rule --add app="^MoodistMac$"            manage=off
 yabai -m rule --add app="^App Store$"            manage=off
 yabai -m rule --add app="^Connection Matrix Workbench$"            manage=off
 
+# Keep floating/unmanaged windows in normal macOS stacking order instead of
+# pinning them above yabai-managed windows.
+yabai -m rule --add app=".*" sub-layer=normal
+
+# Keep Firefox Picture-in-Picture floating and above normal windows.
+yabai -m rule --add label=firefox-pip \
+  app="^Firefox$" title="^Picture-in-Picture$" \
+  manage=off sub-layer=above
+
 yabai -m signal --add event=window_resized app="sioyek" \
   action='/bin/bash /Users/maksim/.config/yabai/sioyek_resize.sh'
 
 yabai -m rule --add app="sioyek" role="AXWindow" subrole="AXDialog" manage=on
 
-yabai -m query --windows |
-  jq -r '.[] | select(.app == "sioyek") | .id' |
-  xargs -I{} yabai -m window {} --opacity 0.8
+yabai -m rule --add label=opacity-sioyek \
+  app="^sioyek$" opacity=0.975
 
-yabai -m query --windows |
-  jq -r '.[] | select(.app == "WezTerm") | .id' |
-  xargs -I{} yabai -m window {} --opacity 0.8
+yabai -m rule --add label=opacity-wezterm \
+  app="^WezTerm$" opacity=0.975
 
-yabai -m query --windows |
-  jq -r '.[] | select(.app == "Firefox") | .id' |
-  xargs -I{} yabai -m window {} --opacity 0.8
+yabai -m rule --add label=opacity-codex \
+  app="^Codex$" opacity=0.975
 
+yabai -m rule --apply
