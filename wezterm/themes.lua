@@ -5,9 +5,9 @@ return {
     foreground = '#CECDC3',
     tab_bar = {
       background = '#100F0F',
-      active_tab = { bg_color = '#205EA6', fg_color = '#FFFCF0' },
-      inactive_tab = { bg_color = '#282726', fg_color = '#CECDC3' },
-      new_tab = { bg_color = '#1C1B1A', fg_color = '#CECDC3' },
+      active_tab = { bg_color = '#100F0F', fg_color = '#FFFFFF' },
+      inactive_tab = { bg_color = '#100F0F', fg_color = '#808080' },
+      new_tab = { bg_color = '#100F0F', fg_color = '#808080' },
     }
   },
   
@@ -16,9 +16,9 @@ return {
     foreground = '#ffffff',
     tab_bar = {
       background = '#100c0c',
-      active_tab = { bg_color = '#f92672', fg_color = '#f8f8f2' },
-      inactive_tab = { bg_color = '#3e3d32', fg_color = '#f8f8f2' },
-      new_tab = { bg_color = '#1e1919', fg_color = '#ffffff' },
+      active_tab = { bg_color = '#100c0c', fg_color = '#FFFFFF' },
+      inactive_tab = { bg_color = '#100c0c', fg_color = '#808080' },
+      new_tab = { bg_color = '#100c0c', fg_color = '#808080' },
     }
   },
 
@@ -27,9 +27,9 @@ return {
     foreground = '#F8F9FA',
     tab_bar = {
       background = '#282C34',
-      active_tab = { bg_color = '#4A5160', fg_color = '#FFFFFF' },
-      inactive_tab = { bg_color = '#1E2127', fg_color = '#F8F9FA' },
-      new_tab = { bg_color = '#1E2127', fg_color = '#F8F9FA' },
+      active_tab = { bg_color = '#282C34', fg_color = '#FFFFFF' },
+      inactive_tab = { bg_color = '#282C34', fg_color = '#808080' },
+      new_tab = { bg_color = '#282C34', fg_color = '#808080' },
     }
   },
 
@@ -38,9 +38,9 @@ return {
     foreground = '#f8f8f2',
     tab_bar = {
       background = '#1a1b26',
-      active_tab = { bg_color = '#282a36', fg_color = '#f8f8f2' },
-      inactive_tab = { bg_color = '#1a1b26', fg_color = '#6272a4' },
-      new_tab = { bg_color = '#0f0f14', fg_color = '#f8f8f2' },
+      active_tab = { bg_color = '#1a1b26', fg_color = '#FFFFFF' },
+      inactive_tab = { bg_color = '#1a1b26', fg_color = '#808080' },
+      new_tab = { bg_color = '#1a1b26', fg_color = '#808080' },
     }
   },
 

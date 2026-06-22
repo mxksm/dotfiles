@@ -12,6 +12,39 @@ local function change_theme(theme_colors)
   end)
 end
 
+-- Keep the window alive when closing its final pane/tab.
+local function close_pane_or_refresh_window(window, pane)
+  local mux_window = window:mux_window()
+  local tabs = mux_window:tabs()
+  local panes = pane:tab():panes()
+
+  if #tabs == 1 and #panes == 1 then
+    window:perform_action(wezterm.action.SpawnCommandInNewTab {
+      cwd = wezterm.home_dir,
+    }, pane)
+  end
+
+  window:perform_action(wezterm.action.CloseCurrentPane { confirm = true }, pane)
+end
+
+-- Close every tab in this window without quitting other WezTerm windows.
+local function close_current_window(window, pane)
+  window:perform_action(wezterm.action.Confirmation {
+    message = '🛑 Close this window?',
+    action = wezterm.action_callback(function(confirmed_window, _)
+      for _, tab in ipairs(confirmed_window:mux_window():tabs()) do
+        local tab_panes = tab:panes()
+        if tab_panes[1] then
+          confirmed_window:perform_action(
+            wezterm.action.CloseCurrentTab { confirm = false },
+            tab_panes[1]
+          )
+        end
+      end
+    end),
+  }, pane)
+end
+
 return {
   -- Clean screen
   {
@@ -60,7 +93,13 @@ return {
   {
     key = 'w',
     mods = 'CMD',
-    action = wezterm.action.CloseCurrentPane { confirm = true },
+    action = wezterm.action_callback(close_pane_or_refresh_window),
+  },
+  -- Close only this window (not the whole WezTerm application)
+  {
+    key = 'w',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action_callback(close_current_window),
   },
   -- Move between panes
   { key = 'h', mods = 'CMD|SHIFT', action = wezterm.action.ActivatePaneDirection 'Left' },
