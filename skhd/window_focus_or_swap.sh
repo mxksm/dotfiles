@@ -5,6 +5,74 @@
 dir="$1"
 swap="$2"
 
+focus_edge_window_on_adjacent_display() {
+  local direction="$1"
+  local displays current_display_id current_display
+  local current_center_x target_display_index target_window_id
+
+  displays=$(yabai -m query --displays)
+  current_display_id=$(yabai -m query --displays --display | jq '.id')
+  current_display=$(echo "$displays" | jq ".[] | select(.id == $current_display_id)")
+  current_center_x=$(echo "$current_display" | jq '.frame.x + (.frame.w / 2)')
+
+  case "$direction" in
+    east)
+      target_display_index=$(
+        echo "$displays" |
+          jq -r --argjson current_center_x "$current_center_x" '
+            map(. + { center_x: (.frame.x + (.frame.w / 2)) })
+            | map(select(.center_x > $current_center_x))
+            | sort_by(.center_x)
+            | first
+            | .index // empty
+          '
+      )
+      [[ -z "$target_display_index" ]] && return 1
+
+      target_window_id=$(
+        yabai -m query --windows |
+          jq -r --argjson display "$target_display_index" '
+            map(select(.display == $display and ."is-visible" == true and ."is-minimized" == false))
+            | sort_by(.frame.x, .frame.y)
+            | first
+            | .id // empty
+          '
+      )
+      ;;
+    west)
+      target_display_index=$(
+        echo "$displays" |
+          jq -r --argjson current_center_x "$current_center_x" '
+            map(. + { center_x: (.frame.x + (.frame.w / 2)) })
+            | map(select(.center_x < $current_center_x))
+            | sort_by(.center_x)
+            | reverse
+            | first
+            | .index // empty
+          '
+      )
+      [[ -z "$target_display_index" ]] && return 1
+
+      target_window_id=$(
+        yabai -m query --windows |
+          jq -r --argjson display "$target_display_index" '
+            map(select(.display == $display and ."is-visible" == true and ."is-minimized" == false))
+            | sort_by((.frame.x + .frame.w), .frame.y)
+            | reverse
+            | first
+            | .id // empty
+          '
+      )
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  [[ -z "$target_window_id" ]] && return 1
+  yabai -m window --focus "$target_window_id"
+}
+
 # Get current window frame (requires jq)
 window=$(yabai -m query --windows --window)
 win_x=$(echo "$window" | jq '.frame.x')
@@ -31,14 +99,18 @@ case "$dir" in
       # At east edge, swap left
       yabai -m window --swap west
     fi
-    yabai -m window --focus east
+    yabai -m window --focus east 2>/dev/null || {
+      [[ "$swap" != "true" ]] && focus_edge_window_on_adjacent_display east
+    }
     ;;
   west)
     if (( $(echo "$win_x <= $disp_x + $tolerance_x" | bc -l) )) && [[ "$swap" == "true" ]]; then
       # At west edge, swap right
       yabai -m window --swap east
     fi
-    yabai -m window --focus west
+    yabai -m window --focus west 2>/dev/null || {
+      [[ "$swap" != "true" ]] && focus_edge_window_on_adjacent_display west
+    }
     ;;
   north)
     if (( $(echo "$win_y <= $disp_y + $tolerance_y" | bc -l) )) && [[ "$swap" == "true" ]]; then
@@ -62,4 +134,3 @@ case "$dir" in
     exit 1
     ;;
 esac
-

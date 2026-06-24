@@ -42,13 +42,13 @@ ctrl + alt - s : yabai --start-service
 ctrl + alt - r : yabai --restart-service
 
 # -- Window Focus or Swap --
-alt - l : ~/.config/skhd/window_focus_or_swap.sh east false
+alt - l : ~/.config/skhd/window_focus_or_swap.sh east  false
 alt - h : ~/.config/skhd/window_focus_or_swap.sh west  false
 alt - j : ~/.config/skhd/window_focus_or_swap.sh south false
 alt - k : ~/.config/skhd/window_focus_or_swap.sh north false
 
-ctrl + alt - l : ~/.config/skhd/window_focus_or_swap.sh east true
-ctrl + alt - h : ~/.config/skhd/window_focus_or_swap.sh west true 
+ctrl + alt - l : ~/.config/skhd/window_focus_or_swap.sh east  true
+ctrl + alt - h : ~/.config/skhd/window_focus_or_swap.sh west  true 
 ctrl + alt - j : ~/.config/skhd/window_focus_or_swap.sh south true 
 ctrl + alt - k : ~/.config/skhd/window_focus_or_swap.sh north true 
 
