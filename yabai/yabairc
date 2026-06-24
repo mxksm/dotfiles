@@ -1,7 +1,7 @@
-sudo -n /opt/homebrew/bin/yabai --load-sa
+sudo yabai --load-sa
 
 yabai -m signal --add event=dock_did_restart \
-  action="sudo -n /opt/homebrew/bin/yabai --load-sa"
+  action="sudo yabai --load-sa"
 
 # bsp or float (default: bsp)
 yabai -m config layout bsp
@@ -71,13 +71,22 @@ yabai -m signal --add event=window_resized app="sioyek" \
 
 yabai -m rule --add app="sioyek" role="AXWindow" subrole="AXDialog" manage=on
 
+
+# App transparency
+
 yabai -m rule --add label=opacity-sioyek \
   app="^sioyek$" opacity=0.975
+
+yabai -m rule --add label=opacity-firefox \
+  app="^Firefox$" opacity=1.0
 
 yabai -m rule --add label=opacity-wezterm \
   app="^WezTerm$" opacity=0.975
 
 yabai -m rule --add label=opacity-codex \
   app="^Codex$" opacity=0.975
+
+yabai -m rule --add label=opacity-chatgpt \
+  app="^ChatGPT$" opacity=0.975
 
 yabai -m rule --apply
