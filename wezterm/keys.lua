@@ -1,10 +1,19 @@
 -- keys.lua
 local wezterm = require 'wezterm'
 local themes = require 'themes'
+local theme_state = require 'theme_state'
 
 -- Helper function to hot-swap the theme
-local function change_theme(theme_colors)
+local function change_theme(theme_name)
   return wezterm.action_callback(function(window, pane)
+    local theme_colors = themes[theme_name]
+
+    if not theme_colors then
+      return
+    end
+
+    theme_state.write(theme_name)
+
     -- Fetch the current overrides so we don't wipe out other runtime changes
     local overrides = window:get_config_overrides() or {}
     overrides.colors = theme_colors
@@ -101,6 +110,17 @@ return {
     mods = 'CMD|SHIFT',
     action = wezterm.action_callback(close_current_window),
   },
+  -- Move current tab left/right with Cmd+< and Cmd+>
+  {
+    key = ',',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.MoveTabRelative(-1),
+  },
+  {
+    key = '.',
+    mods = 'CMD|SHIFT',
+    action = wezterm.action.MoveTabRelative(1),
+  },
   -- Move between panes
   { key = 'h', mods = 'CMD|SHIFT', action = wezterm.action.ActivatePaneDirection 'Left' },
   { key = 'l', mods = 'CMD|SHIFT', action = wezterm.action.ActivatePaneDirection 'Right' },
@@ -125,11 +145,12 @@ return {
     action = wezterm.action.ActivateCommandPalette,
   },
   -- Theme Switching Shortcuts
-  { key = '1', mods = 'ALT', action = change_theme(themes.flexoki) },
-  { key = '2', mods = 'ALT', action = change_theme(themes.monokai) },
-  { key = '3', mods = 'ALT', action = change_theme(themes.slate) },
-  { key = '4', mods = 'ALT', action = change_theme(themes.tokyo_dracula) },
-  { key = '8', mods = 'ALT', action = change_theme(themes.gruvbox_light) },
-  { key = '9', mods = 'ALT', action = change_theme(themes.catppuccin_latte) },
-  { key = '0', mods = 'ALT', action = change_theme(themes.white) },
+  { key = '1', mods = 'ALT', action = change_theme('flexoki') },
+  { key = '2', mods = 'ALT', action = change_theme('monokai') },
+  { key = '3', mods = 'ALT', action = change_theme('slate') },
+  { key = '4', mods = 'ALT', action = change_theme('tokyo_dracula') },
+  { key = '5', mods = 'ALT', action = change_theme('gray_5') },
+  { key = '8', mods = 'ALT', action = change_theme('gruvbox_light') },
+  { key = '9', mods = 'ALT', action = change_theme('catppuccin_latte') },
+  { key = '0', mods = 'ALT', action = change_theme('white') },
 }

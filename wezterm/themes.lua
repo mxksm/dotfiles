@@ -44,6 +44,42 @@ return {
     }
   },
 
+  gray_5 = {
+    background = '#343230',
+    foreground = '#F5F1EA',
+    cursor_bg = '#F5F1EA',
+    cursor_fg = '#343230',
+    cursor_border = '#F5F1EA',
+    selection_bg = '#4D4945',
+    selection_fg = '#FFFFFF',
+    ansi = {
+      '#343230',
+      '#D17272',
+      '#8BAA62',
+      '#C9A95D',
+      '#6AA6B8',
+      '#A88CC8',
+      '#6AA6B8',
+      '#D6D0C8',
+    },
+    brights = {
+      '#4D4945',
+      '#D17272',
+      '#8BAA62',
+      '#C9A95D',
+      '#6AA6B8',
+      '#A88CC8',
+      '#6AA6B8',
+      '#F5F1EA',
+    },
+    tab_bar = {
+      background = '#343230',
+      active_tab = { bg_color = '#343230', fg_color = '#FFFFFF' },
+      inactive_tab = { bg_color = '#343230', fg_color = '#808080' },
+      new_tab = { bg_color = '#343230', fg_color = '#808080' },
+    }
+  },
+
   gruvbox_light = {
     background = '#fbf1c7',
     foreground = '#000000',
