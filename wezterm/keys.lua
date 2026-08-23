@@ -25,12 +25,21 @@ end
 local function close_pane_or_refresh_window(window, pane)
   local mux_window = window:mux_window()
   local tabs = mux_window:tabs()
-  local panes = pane:tab():panes()
+  local active_tab = mux_window:active_tab()
+  local panes = active_tab:panes()
 
   if #tabs == 1 and #panes == 1 then
-    window:perform_action(wezterm.action.SpawnCommandInNewTab {
-      cwd = wezterm.home_dir,
+    window:perform_action(wezterm.action.Confirmation {
+      message = '🛑 Close this tab?',
+      action = wezterm.action_callback(function(confirmed_window, confirmed_pane)
+        confirmed_window:perform_action(wezterm.action.SpawnCommandInNewTab {
+          cwd = wezterm.home_dir,
+        }, confirmed_pane)
+        confirmed_window:perform_action(wezterm.action.ActivateTabRelative(-1), confirmed_pane)
+        confirmed_window:perform_action(wezterm.action.CloseCurrentTab { confirm = false }, confirmed_pane)
+      end),
     }, pane)
+    return
   end
 
   window:perform_action(wezterm.action.CloseCurrentPane { confirm = true }, pane)
