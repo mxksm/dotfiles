@@ -1,12 +1,6 @@
 -- ui.lua
 local wezterm = require 'wezterm'
 
--- Match the compact custom tab strip in Firefox.
-local TAB_FONT_SIZE = 11.0
-local TAB_LAYOUT_FONT_SIZE = 5.0
-local TAB_FONT_CELL_WIDTH = 6.625
-local TAB_HORIZONTAL_PADDING = 16
-
 local SHELLS = {
   bash = true,
   csh = true,
@@ -76,9 +70,48 @@ local function mux_tab_title(tab)
   )
 end
 
--- We return a function that applies settings to the main config object
-return function(config)
+local function tab_appearance(theme_colors)
+  local tab_bar_background = theme_colors.tab_bar.background
+  theme_colors.tab_bar.inactive_tab_edge = tab_bar_background
+  for _, state in ipairs {
+    'active_tab',
+    'inactive_tab',
+    'inactive_tab_hover',
+    'new_tab',
+    'new_tab_hover',
+  } do
+    if theme_colors.tab_bar[state] then
+      theme_colors.tab_bar[state].underline = 'None'
+    end
+  end
+
+  return {
+    background = {
+      {
+        source = { Color = theme_colors.background },
+        width = '100%',
+        height = '100%',
+        repeat_x = 'NoRepeat',
+        repeat_y = 'NoRepeat',
+      },
+      {
+        source = { Color = '#ffffff' },
+        width = '100%',
+        height = 2,
+        opacity = 0.75,
+        repeat_x = 'NoRepeat',
+        repeat_y = 'NoRepeat',
+        vertical_align = 'Top',
+        vertical_offset = '1cell',
+        attachment = 'Fixed',
+      },
+    },
+  }
+end
+
+local function apply(config)
   config.font_size = 15.0
+  config.font = wezterm.font 'JetBrains Mono'
   config.window_decorations = "RESIZE | MACOS_FORCE_SQUARE_CORNERS"
   config.tab_bar_at_bottom = false
   config.show_new_tab_button_in_tab_bar = false
@@ -95,59 +128,11 @@ return function(config)
   -- Remove default window closing confirmation
   config.window_close_confirmation = 'NeverPrompt'
 
-  -- The native-style bar is the only mode with an independently-sized tab font.
-  config.use_fancy_tab_bar = true
+  config.use_fancy_tab_bar = false
+  config.tab_max_width = 999
 
-  local tab_bar_background = config.colors.tab_bar.background
-  config.colors.tab_bar.inactive_tab_edge = tab_bar_background
-  local background_color = wezterm.color.parse(tab_bar_background)
-  local _, _, lightness = background_color:hsla()
-  local divider_color
-
-  if lightness > 0.5 then
-    divider_color = background_color:darken_fixed(0.04)
-  else
-    divider_color = background_color:lighten_fixed(0.04)
-  end
-
-  config.window_frame = {
-    -- Firefox resolves its ui-monospace stack to Menlo on this Mac.
-    -- WezTerm bases the bar height on the unscaled font metrics. Rendering
-    -- Menlo larger inside the smallest unclipped metrics keeps the glyphs at
-    -- Firefox's 11px while making the native bar as compact as WezTerm allows.
-    font = wezterm.font_with_fallback {
-      {
-        family = 'JetBrains Mono',
-        weight = 'Regular',
-        scale = TAB_FONT_SIZE / TAB_LAYOUT_FONT_SIZE,
-      },
-    },
-    font_size = TAB_LAYOUT_FONT_SIZE,
-    active_titlebar_bg = tab_bar_background,
-    inactive_titlebar_bg = tab_bar_background,
-  }
-
-  -- On macOS, WezTerm does not paint the fancy titlebar's advertised bottom
-  -- border at the pane boundary. A one-pixel layer at the top of the terminal
-  -- viewport produces the same full-width separator Firefox paints there.
-  config.background = {
-    {
-      source = { Color = config.colors.background },
-      width = '100%',
-      height = '100%',
-      repeat_x = 'NoRepeat',
-      repeat_y = 'NoRepeat',
-    },
-    {
-      source = { Color = divider_color },
-      width = '100%',
-      height = '1px',
-      repeat_x = 'NoRepeat',
-      repeat_y = 'NoRepeat',
-      vertical_align = 'Top',
-      vertical_offset = 45,
-    },
-  }
+  local appearance = tab_appearance(config.colors)
+  config.background = appearance.background
 
   wezterm.on('format-tab-title', function(tab)
     local elements = {}
@@ -158,41 +143,31 @@ return function(config)
       table.insert(elements, { Attribute = { Intensity = 'Normal' } })
     end
 
-    table.insert(elements, {
-      Text = string.format(' %d: %s ', tab.tab_index + 1, formatted_tab_title(tab)),
-    })
+    local title = string.format(' %d: %s ', tab.tab_index + 1, formatted_tab_title(tab))
+    table.insert(elements, { Text = title })
 
     return elements
   end)
 
-  -- Add an event listener that recalculates the layout every time the status updates
+  -- Center the full group in terminal columns, which is independent of DPI.
   wezterm.on('update-status', function(window, pane)
     local tabs = window:mux_window():tabs()
-    local total_tabs_width = #tabs * TAB_HORIZONTAL_PADDING
+    local total_tabs_width = 0
 
-    -- Measure the labels using the same Menlo metrics as the tab bar.
     for index, tab in ipairs(tabs) do
-      local label = string.format('%d: %s', index, mux_tab_title(tab))
-      total_tabs_width = total_tabs_width
-        + wezterm.column_width(label) * TAB_FONT_CELL_WIDTH
+      local label = string.format(' %d: %s ', index, mux_tab_title(tab))
+      total_tabs_width = total_tabs_width + wezterm.column_width(label)
     end
 
-    local dimensions = window:get_dimensions()
-    if not dimensions.dpi or dimensions.dpi <= 0 then
-      return
-    end
-
-    local scale = dimensions.dpi / 72
-    local screen_width = dimensions.pixel_width / scale
-
-    local left_padding = math.floor(
-      (screen_width - total_tabs_width) / 2 / TAB_FONT_CELL_WIDTH
-    )
-    if left_padding < 0 then
-      left_padding = 0
-    end
-
-    -- Push the group, rather than each individual tab, into the center.
+    local columns = pane:get_dimensions().cols
+    local remaining = math.max(columns - total_tabs_width, 0)
+    local left_padding = math.floor(remaining / 2)
     window:set_left_status(string.rep(' ', left_padding))
+    window:set_right_status('')
   end)
 end
+
+return {
+  apply = apply,
+  tab_appearance = tab_appearance,
+}

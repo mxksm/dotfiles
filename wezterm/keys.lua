@@ -2,53 +2,7 @@
 local wezterm = require 'wezterm'
 local themes = require 'themes'
 local theme_state = require 'theme_state'
-
-local function tab_appearance(theme_colors)
-  local tab_bar_background = theme_colors.tab_bar.background
-  theme_colors.tab_bar.inactive_tab_edge = tab_bar_background
-  local background_color = wezterm.color.parse(tab_bar_background)
-  local _, _, lightness = background_color:hsla()
-  local divider_color
-
-  if lightness > 0.5 then
-    divider_color = background_color:darken_fixed(0.04)
-  else
-    divider_color = background_color:lighten_fixed(0.04)
-  end
-
-  return {
-    window_frame = {
-      font = wezterm.font_with_fallback {
-        {
-          family = 'JetBrains Mono',
-          weight = 'Regular',
-          scale = 11.0 / 5.0,
-        },
-      },
-      font_size = 5.0,
-      active_titlebar_bg = tab_bar_background,
-      inactive_titlebar_bg = tab_bar_background,
-    },
-    background = {
-      {
-        source = { Color = theme_colors.background },
-        width = '100%',
-        height = '100%',
-        repeat_x = 'NoRepeat',
-        repeat_y = 'NoRepeat',
-      },
-      {
-        source = { Color = divider_color },
-        width = '100%',
-        height = '1px',
-        repeat_x = 'NoRepeat',
-        repeat_y = 'NoRepeat',
-        vertical_align = 'Top',
-        vertical_offset = 45,
-      },
-    },
-  }
-end
+local ui = require 'ui'
 
 -- Helper function to hot-swap the theme
 local function change_theme(theme_name)
@@ -63,9 +17,8 @@ local function change_theme(theme_name)
 
     -- Fetch the current overrides so we don't wipe out other runtime changes
     local overrides = window:get_config_overrides() or {}
-    local appearance = tab_appearance(theme_colors)
+    local appearance = ui.tab_appearance(theme_colors)
     overrides.colors = theme_colors
-    overrides.window_frame = appearance.window_frame
     overrides.background = appearance.background
     window:set_config_overrides(overrides)
   end)
