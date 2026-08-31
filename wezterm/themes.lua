@@ -1,4 +1,3 @@
--- themes.lua
 return {
   flexoki = {
     background = '#100F0F',

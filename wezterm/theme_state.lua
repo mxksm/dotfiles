@@ -1,8 +1,8 @@
--- theme_state.lua
+local wezterm = require 'wezterm'
 local M = {}
 
 local function state_path()
-  return os.getenv('HOME') .. '/.config/wezterm/last_theme'
+  return wezterm.config_dir .. '/.last_theme'
 end
 
 function M.read(themes, fallback_name)
@@ -24,14 +24,29 @@ function M.read(themes, fallback_name)
 end
 
 function M.write(theme_name)
-  local file = io.open(state_path(), 'w')
+  local file, open_error = io.open(state_path(), 'w')
 
   if not file then
-    return
+    wezterm.log_error('Unable to save the selected theme: ' .. tostring(open_error))
+    return false
   end
 
-  file:write(theme_name .. '\n')
-  file:close()
+  local wrote, write_error = file:write(theme_name .. '\n')
+
+  if not wrote then
+    file:close()
+    wezterm.log_error('Unable to save the selected theme: ' .. tostring(write_error))
+    return false
+  end
+
+  local closed, close_error = file:close()
+
+  if not closed then
+    wezterm.log_error('Unable to save the selected theme: ' .. tostring(close_error))
+    return false
+  end
+
+  return true
 end
 
 return M

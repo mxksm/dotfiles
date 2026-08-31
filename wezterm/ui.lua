@@ -1,4 +1,3 @@
--- ui.lua
 local wezterm = require 'wezterm'
 
 local SHELLS = {
@@ -95,10 +94,12 @@ local function tab_appearance(theme_colors)
         repeat_y = 'NoRepeat',
       },
       {
-        source = { Color = '#ffffff' },
+        source = {
+          Color = theme_colors.tab_bar.inactive_tab.fg_color
+            or theme_colors.foreground,
+        },
         width = '100%',
-        height = 2,
-        opacity = 0.75,
+        height = 1,
         repeat_x = 'NoRepeat',
         repeat_y = 'NoRepeat',
         vertical_align = 'Top',
@@ -125,7 +126,6 @@ local function apply(config)
     right  = 10,
   }
 
-  -- Remove default window closing confirmation
   config.window_close_confirmation = 'NeverPrompt'
 
   config.use_fancy_tab_bar = false
