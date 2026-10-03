@@ -111,7 +111,7 @@ local function tab_appearance(theme_colors)
 end
 
 local function apply(config)
-  config.font_size = 15.0
+  config.font_size = 16.0
   config.font = wezterm.font 'JetBrains Mono'
   config.window_decorations = "RESIZE | MACOS_FORCE_SQUARE_CORNERS"
   config.tab_bar_at_bottom = false

@@ -61,3 +61,6 @@ shift + alt - k: ~/.config/skhd/window_resize.sh k
 # resize term to 
 shift + alt - s : ~/.config/skhd/term_resize.sh 0.774
 shift + alt - d : ~/.config/skhd/term_resize.sh 1.0
+
+# make windows side by side instead of on top of each other
+shift + alt - v : yabai -m window --toggle split
