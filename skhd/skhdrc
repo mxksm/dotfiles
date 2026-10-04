@@ -8,7 +8,7 @@ alt - g: yabai -m display --focus east # -- Modifying the Layout --
 shift + alt - r : yabai -m space --rotate 270
 shift + alt - y : yabai -m space --mirror y-axis
 shift + alt - x : yabai -m space --mirror x-axis
-shift + alt - t : yabai -m window --toggle float --grid 4:4:1:1:2:2
+shift + alt - t : sh ~/.config/skhd/float_center.sh 59 66.5
 
 # maximize a window
 shift + alt - m : yabai -m window --toggle zoom-fullscreen
