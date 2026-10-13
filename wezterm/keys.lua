@@ -67,6 +67,11 @@ end
 
 return {
   {
+    key = 'Tab',
+    mods = 'CTRL',
+    action = wezterm.action.ActivateLastTab,
+  },
+  {
     key = 'k',
     mods = 'CMD',
     action = wezterm.action.ClearScrollback 'ScrollbackAndViewport',
