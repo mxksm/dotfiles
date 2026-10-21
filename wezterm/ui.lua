@@ -5,6 +5,7 @@ local wezterm = require 'wezterm'
 -- (56 physical pixels on Retina), matching Sioyek's native title/tab bar.
 local TAB_FONT_SIZE = 12
 local TAB_BAR_HEIGHT = 28
+local SEPARATOR_BAND_HEIGHT = string.format('%dpt', TAB_BAR_HEIGHT + 1)
 
 local SHELLS = {
   bash = true,
@@ -113,11 +114,14 @@ local function tab_appearance(theme_colors)
             or theme_colors.foreground,
         },
         width = '100%',
-        height = 1,
+        -- Draw a solid band behind the opaque tab bar, with one point exposed
+        -- below it. A one-pixel Color layer creates a filtered 1x1 texture;
+        -- this larger texture keeps the separator solid on Retina displays.
+        height = SEPARATOR_BAND_HEIGHT,
         repeat_x = 'NoRepeat',
         repeat_y = 'NoRepeat',
         vertical_align = 'Top',
-        vertical_offset = string.format('%dpt', TAB_BAR_HEIGHT),
+        vertical_offset = 0,
         attachment = 'Fixed',
       },
     },
@@ -153,7 +157,9 @@ local function apply(config)
   -- the shared tab size changes, including the separator's position.
   wezterm.on('window-config-reloaded', function(window)
     local overrides = window:get_config_overrides() or {}
-    if overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE then
+    local separator = overrides.background and overrides.background[2]
+    if (overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE)
+      or (overrides.background and (not separator or separator.height ~= SEPARATOR_BAND_HEIGHT)) then
       local updated = tab_appearance(window:effective_config().colors)
       overrides.window_frame = updated.window_frame
       overrides.background = updated.background
