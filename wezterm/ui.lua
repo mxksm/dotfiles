@@ -1,10 +1,10 @@
 local wezterm = require 'wezterm'
 
 -- Separate from the terminal's font_size and Cmd +/- zoom. The fancy renderer
--- uses ceil(font cell height * 1.75); JetBrains Mono at 9.5pt gives a 22pt bar
--- (44 physical pixels on Retina), matching Sioyek's native title/tab bar.
-local TAB_FONT_SIZE = 9.5
-local TAB_BAR_HEIGHT = 22
+-- uses ceil(font cell height * 1.75); JetBrains Mono at 12pt gives a 28pt bar
+-- (56 physical pixels on Retina), matching Sioyek's native title/tab bar.
+local TAB_FONT_SIZE = 12
+local TAB_BAR_HEIGHT = 28
 
 local SHELLS = {
   bash = true,
@@ -148,6 +148,18 @@ local function apply(config)
   local appearance = tab_appearance(config.colors)
   config.background = appearance.background
   config.window_frame = appearance.window_frame
+
+  -- Theme overrides survive config reloads. Update existing windows too when
+  -- the shared tab size changes, including the separator's position.
+  wezterm.on('window-config-reloaded', function(window)
+    local overrides = window:get_config_overrides() or {}
+    if overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE then
+      local updated = tab_appearance(window:effective_config().colors)
+      overrides.window_frame = updated.window_frame
+      overrides.background = updated.background
+      window:set_config_overrides(overrides)
+    end
+  end)
 
   wezterm.on('format-tab-title', function(tab)
     local elements = {}
