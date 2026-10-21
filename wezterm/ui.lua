@@ -1,5 +1,11 @@
 local wezterm = require 'wezterm'
 
+-- Separate from the terminal's font_size and Cmd +/- zoom. The fancy renderer
+-- uses ceil(font cell height * 1.75); JetBrains Mono at 9.5pt gives a 22pt bar
+-- (44 physical pixels on Retina), matching Sioyek's native title/tab bar.
+local TAB_FONT_SIZE = 9.5
+local TAB_BAR_HEIGHT = 22
+
 local SHELLS = {
   bash = true,
   csh = true,
@@ -85,6 +91,14 @@ local function tab_appearance(theme_colors)
   end
 
   return {
+    window_frame = {
+      font = wezterm.font 'JetBrains Mono',
+      font_size = TAB_FONT_SIZE,
+      active_titlebar_bg = tab_bar_background,
+      inactive_titlebar_bg = tab_bar_background,
+      active_titlebar_fg = theme_colors.foreground,
+      inactive_titlebar_fg = theme_colors.foreground,
+    },
     background = {
       {
         source = { Color = theme_colors.background },
@@ -103,7 +117,7 @@ local function tab_appearance(theme_colors)
         repeat_x = 'NoRepeat',
         repeat_y = 'NoRepeat',
         vertical_align = 'Top',
-        vertical_offset = '1cell',
+        vertical_offset = string.format('%dpt', TAB_BAR_HEIGHT),
         attachment = 'Fixed',
       },
     },
@@ -128,11 +142,12 @@ local function apply(config)
 
   config.window_close_confirmation = 'NeverPrompt'
 
-  config.use_fancy_tab_bar = false
+  config.use_fancy_tab_bar = true
   config.tab_max_width = 999
 
   local appearance = tab_appearance(config.colors)
   config.background = appearance.background
+  config.window_frame = appearance.window_frame
 
   wezterm.on('format-tab-title', function(tab)
     local elements = {}
@@ -149,19 +164,26 @@ local function apply(config)
     return elements
   end)
 
-  -- Center the full group in terminal columns, which is independent of DPI.
-  wezterm.on('update-status', function(window, pane)
+  -- Center using the tab font and whole window, never the active pane's terminal
+  -- columns. Terminal zoom and splitting panes must not change tab spacing.
+  wezterm.on('update-status', function(window)
     local tabs = window:mux_window():tabs()
+    local dimensions = window:get_dimensions()
+    local scale = dimensions.dpi / 72
+    -- JetBrains Mono's glyph advance is 0.6em. Fancy tabs also have half-cell
+    -- padding on each side and a one-physical-pixel border on each side.
+    local advance = TAB_FONT_SIZE * 0.6 * scale
+    local cell_width = math.floor(advance + 0.5)
     local total_tabs_width = 0
 
     for index, tab in ipairs(tabs) do
       local label = string.format(' %d: %s ', index, mux_tab_title(tab))
-      total_tabs_width = total_tabs_width + wezterm.column_width(label)
+      total_tabs_width = total_tabs_width + wezterm.column_width(label) * advance
+        + cell_width + 2
     end
 
-    local columns = pane:get_dimensions().cols
-    local remaining = math.max(columns - total_tabs_width, 0)
-    local left_padding = math.floor(remaining / 2)
+    local remaining = math.max(dimensions.pixel_width - total_tabs_width, 0)
+    local left_padding = math.max(0, math.floor((remaining / 2 - cell_width) / advance))
     window:set_left_status(string.rep(' ', left_padding))
     window:set_right_status('')
   end)

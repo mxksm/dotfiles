@@ -20,6 +20,7 @@ local function change_theme(theme_name)
     local appearance = ui.tab_appearance(theme_colors)
     overrides.colors = theme_colors
     overrides.background = appearance.background
+    overrides.window_frame = appearance.window_frame
     window:set_config_overrides(overrides)
     wezterm.reload_configuration()
   end)
