@@ -2,7 +2,8 @@ local wezterm = require 'wezterm'
 
 -- Separate from the terminal's font_size and Cmd +/- zoom. The fancy renderer
 -- uses ceil(font cell height * 1.75); JetBrains Mono at 12pt gives a 28pt bar
--- (56 physical pixels on Retina), matching Sioyek's native title/tab bar.
+-- (56 physical pixels on Retina). With the separator below, the total is 29pt,
+-- matching Sioyek's title/tab bar, which includes its separator inside the bar.
 local TAB_FONT_SIZE = 12
 local TAB_BAR_HEIGHT = 28
 local SEPARATOR_BAND_HEIGHT = string.format('%dpt', TAB_BAR_HEIGHT + 1)
