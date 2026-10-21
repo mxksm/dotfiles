@@ -1,12 +1,7 @@
 local wezterm = require 'wezterm'
 
--- Separate from the terminal's font_size and Cmd +/- zoom. The fancy renderer
--- uses ceil(font cell height * 1.75); JetBrains Mono at 12pt gives a 28pt bar
--- (56 physical pixels on Retina). With the separator below, the total is 29pt,
--- matching Sioyek's title/tab bar, which includes its separator inside the bar.
+-- Separate from the terminal's font_size and Cmd +/- zoom.
 local TAB_FONT_SIZE = 12
-local TAB_BAR_HEIGHT = 28
-local SEPARATOR_BAND_HEIGHT = string.format('%dpt', TAB_BAR_HEIGHT + 1)
 
 local SHELLS = {
   bash = true,
@@ -109,22 +104,6 @@ local function tab_appearance(theme_colors)
         repeat_x = 'NoRepeat',
         repeat_y = 'NoRepeat',
       },
-      {
-        source = {
-          Color = theme_colors.tab_bar.inactive_tab.fg_color
-            or theme_colors.foreground,
-        },
-        width = '100%',
-        -- Draw a solid band behind the opaque tab bar, with one point exposed
-        -- below it. A one-pixel Color layer creates a filtered 1x1 texture;
-        -- this larger texture keeps the separator solid on Retina displays.
-        height = SEPARATOR_BAND_HEIGHT,
-        repeat_x = 'NoRepeat',
-        repeat_y = 'NoRepeat',
-        vertical_align = 'Top',
-        vertical_offset = 0,
-        attachment = 'Fixed',
-      },
     },
   }
 end
@@ -154,13 +133,12 @@ local function apply(config)
   config.background = appearance.background
   config.window_frame = appearance.window_frame
 
-  -- Theme overrides survive config reloads. Update existing windows too when
-  -- the shared tab size changes, including the separator's position.
+  -- Theme overrides survive config reloads. Refresh the tab font and remove
+  -- the old separator layer from existing windows too.
   wezterm.on('window-config-reloaded', function(window)
     local overrides = window:get_config_overrides() or {}
-    local separator = overrides.background and overrides.background[2]
     if (overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE)
-      or (overrides.background and (not separator or separator.height ~= SEPARATOR_BAND_HEIGHT)) then
+      or (overrides.background and overrides.background[2]) then
       local updated = tab_appearance(window:effective_config().colors)
       overrides.window_frame = updated.window_frame
       overrides.background = updated.background
