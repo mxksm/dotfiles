@@ -1,3 +1,8 @@
+# Keep Ctrl+number shortcuts tied to a stable Mission Control desktop order.
+# macOS can otherwise reorder Spaces by recent use. On an existing session,
+# restart Dock once after applying this preference (not on every config reload).
+/usr/bin/defaults write com.apple.dock mru-spaces -bool false
+
 sudo yabai --load-sa
 
 yabai -m signal --add event=dock_did_restart \
