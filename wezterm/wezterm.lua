@@ -14,6 +14,17 @@ local theme_state = require 'theme_state'
 local keys = require 'keys'
 local ui = require 'ui'
 
+-- The Neovim instance handling a SyncTeX inverse search emits this event.
+wezterm.on('user-var-changed', function(window, pane, name)
+  if name == 'SIOYEK_SOURCE_JUMP' then
+    local tab = pane:tab()
+    tab:activate()
+    tab:set_zoomed(false)
+    pane:activate()
+    window:focus()
+  end
+end)
+
 config.colors = theme_state.read(themes, 'monokai')
 config.keys = keys
 
