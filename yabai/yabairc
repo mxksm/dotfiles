@@ -25,44 +25,45 @@ yabai -m config mouse_follows_focus          on
 #yabai -m config focus_follows_mouse          autoraise
 
 # float system preferences
-yabai -m rule --add app="^System Settings$"    manage=off
-yabai -m rule --add app="^System Information$" manage=off
-yabai -m rule --add app="^Activity Monitor$"   manage=off
-yabai -m rule --add title="^About This Mac$"   manage=off
-yabai -m rule --add app="^About This Mac$"     manage=off
-yabai -m rule --add app="^Macs Fan Control$"   manage=off
-yabai -m rule --add app="^Mail$"               manage=off
-yabai -m rule --add app="^Calculator$"         manage=off
-yabai -m rule --add app="^Karabiner-Elements$" manage=off
-yabai -m rule --add app="^QuickTime Player$"   manage=off
-yabai -m rule --add app="^Photo Booth$"        manage=off
-yabai -m rule --add app="^Photos$"             manage=off
-yabai -m rule --add app="^UTM$"                manage=off
-yabai -m rule --add app="^Books$"              manage=off
-yabai -m rule --add app="^Mousecape$"          manage=off
-yabai -m rule --add app="^Calendar$"           manage=off
-yabai -m rule --add app="^Terminal$"           manage=off
-yabai -m rule --add app="^MySFMLProject$"      manage=off
-yabai -m rule --add app="^Preview$"            manage=off
-yabai -m rule --add app="^Sitcky Notepad$"     manage=off
-yabai -m rule --add app="^mpv$"                manage=off
-yabai -m rule --add app="^Messages$"           manage=off
-yabai -m rule --add app="^Notes$"              manage=off
-#yabai -m rule --add app="^python3$"           manage=off
-yabai -m rule --add app="^Clock$"              manage=off
-yabai -m rule --add app="^Find My$"            manage=off
-yabai -m rule --add app="^Maps$"               manage=off
-yabai -m rule --add app="^FaceTime$"           manage=off
-yabai -m rule --add app="^Weather$"            manage=off
-yabai -m rule --add app="^Finder$"             manage=off
-yabai -m rule --add app="^Dictionary$"         manage=off
-yabai -m rule --add app="^Headspace$"          manage=off
-yabai -m rule --add app="^Raycast$"            manage=off
-#yabai -m rule --add app="^Python$"             manage=off
-yabai -m rule --add app="^Cisco Secure Client$"             manage=off
-yabai -m rule --add app="^MoodistMac$"            manage=off
-yabai -m rule --add app="^App Store$"            manage=off
-yabai -m rule --add app="^Connection Matrix Workbench$"            manage=off
+yabai -m rule --add app="^System Settings$"     manage=off
+yabai -m rule --add app="^System Information$"  manage=off
+yabai -m rule --add app="^Activity Monitor$"    manage=off
+yabai -m rule --add title="^About This Mac$"    manage=off
+yabai -m rule --add app="^About This Mac$"      manage=off
+yabai -m rule --add app="^Macs Fan Control$"    manage=off
+yabai -m rule --add app="^Mail$"                manage=off
+yabai -m rule --add app="^Calculator$"          manage=off
+yabai -m rule --add app="^Karabiner-Elements$"  manage=off
+yabai -m rule --add app="^QuickTime Player$"    manage=off
+yabai -m rule --add app="^Photo Booth$"         manage=off
+yabai -m rule --add app="^Photos$"              manage=off
+yabai -m rule --add app="^UTM$"                 manage=off
+yabai -m rule --add app="^Books$"               manage=off
+yabai -m rule --add app="^Mousecape$"           manage=off
+yabai -m rule --add app="^Calendar$"            manage=off
+yabai -m rule --add app="^Terminal$"            manage=off
+yabai -m rule --add app="^Preview$"             manage=off
+yabai -m rule --add app="^Sitcky Notepad$"      manage=off
+yabai -m rule --add app="^mpv$"                 manage=off
+yabai -m rule --add app="^Messages$"            manage=off
+yabai -m rule --add app="^Notes$"               manage=off
+yabai -m rule --add app="^Clock$"               manage=off
+yabai -m rule --add app="^Find My$"             manage=off
+yabai -m rule --add app="^Maps$"                manage=off
+yabai -m rule --add app="^FaceTime$"            manage=off
+yabai -m rule --add app="^Weather$"             manage=off
+yabai -m rule --add app="^Finder$"              manage=off
+yabai -m rule --add app="^Dictionary$"          manage=off
+yabai -m rule --add app="^Headspace$"           manage=off
+yabai -m rule --add app="^Raycast$"             manage=off
+yabai -m rule --add app="^Python$"              manage=off
+yabai -m rule --add app="^Cisco Secure Client$" manage=off
+yabai -m rule --add app="^MoodistMac$"          manage=off
+yabai -m rule --add app="^App Store$"           manage=off
+yabai -m rule --add app="^Tailscale$"           manage=off
+yabai -m rule --add app="^Screen Sharing$"      manage=off
+yabai -m rule --add app="^Zoom Workplace$"      manage=off
+yabai -m rule --add app="^Zoom$"                manage=off
 
 # Keep floating/unmanaged windows in normal macOS stacking order instead of
 # pinning them above yabai-managed windows.
