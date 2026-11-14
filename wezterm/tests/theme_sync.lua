@@ -34,6 +34,11 @@ local function send(bg, fg, event)
   assert(vim.wait(500, function() return messages > previous end), 'theme event published')
   assert(overrides.colors.background == bg and overrides.colors.foreground == fg)
   assert(overrides.colors.tab_bar.background == bg and overrides.window_frame.active_titlebar_bg == bg)
+  local tabs = overrides.colors.tab_bar
+  assert(tabs.active_tab.bg_color ~= tabs.inactive_tab.bg_color, 'active tab has a distinct background')
+  assert(tabs.active_tab.fg_color == fg and tabs.inactive_tab.fg_color ~= fg, 'inactive labels are muted')
+  assert(tabs.inactive_tab.bg_color == bg, 'rest of tab bar matches terminal')
+  assert(tabs.inactive_tab_hover.bg_color ~= tabs.active_tab.bg_color, 'hover remains distinct from active tab')
   assert(overrides.font_size == 19 and next(overrides.background) == nil, 'zoom preserved and opaque layer removed')
   assert(state.read(presets, 'monokai').background == bg, 'palette survives reload/restart')
 end
@@ -66,5 +71,20 @@ assert(state.write('catppuccin_latte'))
 assert(state.read(presets, 'monokai').background == presets.catppuccin_latte.background, 'favorite presets still work')
 vim.api.nvim_set_hl(0, 'Normal', { fg = '#ffffff' })
 assert(editor.palette() == nil, 'explicit transparency is respected')
+local handlers = {}
+mock.on = function(name, callback) handlers[name] = callback end
+local ui = require 'ui'
+ui.apply { colors = theme.colors { background = '#282c34', foreground = '#eeeeee' } }
+overrides.colors = theme.colors { background = '#282c34', foreground = '#eeeeee' }
+overrides.colors.tab_bar.active_tab = { bg_color = '#282c34', fg_color = '#eeeeee' }
+overrides.colors.tab_bar.inactive_tab = { bg_color = '#282c34', fg_color = '#eeeeee' }
+window.effective_config = function() return { colors = overrides.colors } end
+local updates = 0
+window.set_config_overrides = function(_, value) overrides = value; updates = updates + 1 end
+handlers['window-config-reloaded'](window)
+assert(updates == 1 and overrides.colors.tab_bar.active_tab.bg_color ~= overrides.colors.tab_bar.inactive_tab.bg_color,
+  'reload repairs existing identical tab overrides')
+handlers['window-config-reloaded'](window)
+assert(updates == 1, 'repair does not cause a reload loop')
 vim.fn.delete(temp, 'rf')
 print('PASS: real Neovim events and OSC payloads, arbitrary/light/dark palettes, preview rollback, persistence, preset fallback, validation, unrelated overrides')

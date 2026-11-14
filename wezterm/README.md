@@ -4,7 +4,8 @@ Neovim drives the terminal palette while it is active. Choose any NvChad theme
 with `Space th`: its background, foreground, and terminal colors also apply to
 WezTerm, including the padding and tabs. Previewing a theme updates the terminal;
 Escape restores the previous theme. The shell keeps the chosen palette after
-Neovim exits.
+Neovim exits. Active tabs use a subtle theme-colored background tint and full
+foreground color; inactive tabs use muted labels against the terminal background.
 
 The Option+number shortcuts still select the presets in `keys.lua`. They change
 the terminal palette, not Neovim’s selected theme. Neovim sends its palette again

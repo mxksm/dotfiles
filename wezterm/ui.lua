@@ -129,9 +129,17 @@ local function apply(config)
   -- fixed background layers from existing windows too.
   wezterm.on('window-config-reloaded', function(window)
     local overrides = window:get_config_overrides() or {}
-    if (overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE)
+    local tabs = overrides.colors and overrides.colors.tab_bar
+    local active, inactive = tabs and tabs.active_tab, tabs and tabs.inactive_tab
+    local indistinguishable = active and inactive
+      and active.bg_color == inactive.bg_color and active.fg_color == inactive.fg_color
+    if indistinguishable then
+      overrides.colors = require('nvim_theme').colors(overrides.colors) or overrides.colors
+    end
+    if indistinguishable
+      or (overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE)
       or (overrides.background and next(overrides.background)) then
-      local updated = tab_appearance(window:effective_config().colors)
+      local updated = tab_appearance(overrides.colors or window:effective_config().colors)
       overrides.window_frame = updated.window_frame
       overrides.background = {}
       window:set_config_overrides(overrides)
