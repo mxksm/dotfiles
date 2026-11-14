@@ -15,7 +15,11 @@ local keys = require 'keys'
 local ui = require 'ui'
 
 -- The Neovim instance handling a SyncTeX inverse search emits this event.
-wezterm.on('user-var-changed', function(window, pane, name)
+wezterm.on('user-var-changed', function(window, pane, name, value)
+  if name == 'NVIM_THEME' then
+    require('nvim_theme').apply(window, pane, value)
+    return
+  end
   if name == 'SIOYEK_SOURCE_JUMP' then
     local tab = pane:tab()
     tab:activate()

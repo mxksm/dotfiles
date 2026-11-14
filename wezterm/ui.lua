@@ -96,15 +96,7 @@ local function tab_appearance(theme_colors)
       active_titlebar_fg = theme_colors.foreground,
       inactive_titlebar_fg = theme_colors.foreground,
     },
-    background = {
-      {
-        source = { Color = theme_colors.background },
-        width = '100%',
-        height = '100%',
-        repeat_x = 'NoRepeat',
-        repeat_y = 'NoRepeat',
-      },
-    },
+
   }
 end
 
@@ -130,18 +122,18 @@ local function apply(config)
   config.tab_max_width = 999
 
   local appearance = tab_appearance(config.colors)
-  config.background = appearance.background
+  config.background = {} -- Use colors.background, without a fixed opaque layer.
   config.window_frame = appearance.window_frame
 
   -- Theme overrides survive config reloads. Refresh the tab font and remove
-  -- the old separator layer from existing windows too.
+  -- fixed background layers from existing windows too.
   wezterm.on('window-config-reloaded', function(window)
     local overrides = window:get_config_overrides() or {}
     if (overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE)
-      or (overrides.background and overrides.background[2]) then
+      or (overrides.background and next(overrides.background)) then
       local updated = tab_appearance(window:effective_config().colors)
       overrides.window_frame = updated.window_frame
-      overrides.background = updated.background
+      overrides.background = {}
       window:set_config_overrides(overrides)
     end
   end)
