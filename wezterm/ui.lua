@@ -146,7 +146,7 @@ local function apply(config)
     end
   end)
 
-  wezterm.on('format-tab-title', function(tab)
+  wezterm.on('format-tab-title', function(tab, _, _, effective_config, hover)
     local elements = {}
 
     if tab.is_active then
@@ -155,8 +155,19 @@ local function apply(config)
       table.insert(elements, { Attribute = { Intensity = 'Normal' } })
     end
 
+    local tabs = effective_config.colors.tab_bar
+    local state = tab.is_active and tabs.active_tab
+      or (hover and tabs.inactive_tab_hover) or tabs.inactive_tab
+    -- Fancy tabs derive their rounded outer fill from the first cell.
+    -- Keep that cell neutral; color only the rectangular label cells.
+    table.insert(elements, { Background = { Color = tabs.background } })
+    table.insert(elements, { Text = ' ' })
+    table.insert(elements, { Background = { Color = state.bg_color } })
+    table.insert(elements, { Foreground = { Color = state.fg_color } })
     local title = string.format(' %d: %s ', tab.tab_index + 1, formatted_tab_title(tab))
     table.insert(elements, { Text = title })
+    table.insert(elements, { Background = { Color = tabs.background } })
+    table.insert(elements, { Text = ' ' })
 
     return elements
   end)
@@ -174,7 +185,7 @@ local function apply(config)
     local total_tabs_width = 0
 
     for index, tab in ipairs(tabs) do
-      local label = string.format(' %d: %s ', index, mux_tab_title(tab))
+      local label = string.format('  %d: %s  ', index, mux_tab_title(tab))
       total_tabs_width = total_tabs_width + wezterm.column_width(label) * advance
         + cell_width + 2
     end
