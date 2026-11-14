@@ -10,6 +10,9 @@ The Option+number shortcuts still select the presets in `keys.lua`. They change
 the terminal palette, not Neovim’s selected theme. Neovim sends its palette again
 when its theme changes or it regains focus.
 
+The theme picker starts in normal mode (`j`/`k` to preview, `i` to search).
+The empty part of Neovim’s buffer bar shares the editor background.
+
 Neovim must have transparency disabled for its theme to supply a background.
 The integration lives in `nvim/lua/configs/wezterm_theme.lua` and
 `wezterm/nvim_theme.lua`. Restart existing Neovim sessions after updating it.

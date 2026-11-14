@@ -29,8 +29,8 @@ end
 editor.setup()
 local function send(bg, fg, event)
   vim.api.nvim_set_hl(0, 'Normal', { bg = bg, fg = fg })
-  vim.api.nvim_exec_autocmds(event or 'User', event and {} or { pattern = 'NvThemeReload' })
   local previous = messages
+  vim.api.nvim_exec_autocmds(event or 'User', event and {} or { pattern = 'NvThemeReload' })
   assert(vim.wait(500, function() return messages > previous end), 'theme event published')
   assert(overrides.colors.background == bg and overrides.colors.foreground == fg)
   assert(overrides.colors.tab_bar.background == bg and overrides.window_frame.active_titlebar_bg == bg)
@@ -41,6 +41,22 @@ send('#282c34', '#eeeeee')
 send('#eff1f5', '#4c4f69') -- light preview
 send('#282c34', '#eeeeee') -- Escape rollback
 send('#123456', '#fedcba', 'ColorScheme') -- arbitrary, non-preset theme
+send('#654321', '#abcdef', 'SafeState') -- themes that do not emit ColorScheme/NvThemeReload
+local get_hl = vim.api.nvim_get_hl
+vim.api.nvim_get_hl = function(ns, opts)
+  if opts.name == 'Normal' and opts.link == false then return { bg = 0x222222 } end
+  return get_hl(ns, opts)
+end
+assert(editor.palette().background == '#654321', 'floating picker winhl cannot replace global theme palette')
+vim.api.nvim_get_hl = get_hl
+vim.api.nvim_set_hl(0, 'SharedThemeNormal', { bg = '#654321', fg = '#abcdef' })
+vim.api.nvim_set_hl(0, 'Normal', { link = 'SharedThemeNormal' })
+assert(editor.palette().background == '#654321', 'global Normal links are resolved')
+local unchanged = messages
+vim.api.nvim_exec_autocmds('SafeState', {})
+assert(messages == unchanged, 'idle input does not resend unchanged palettes')
+vim.api.nvim_exec_autocmds('FocusGained', {})
+assert(messages == unchanged + 1, 'focus still restores the active editor palette')
 local before = vim.deepcopy(overrides)
 theme.apply(window, pane, '{bad json')
 theme.apply(window, pane, vim.json.encode { colors = { background = 'bad', foreground = '#ffffff' } })
