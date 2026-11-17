@@ -27,3 +27,7 @@ Run the integration regression check from the dotfiles root:
 ```sh
 NVIM_LOG_FILE=/tmp/wezterm-theme-test.log nvim --headless -u NONE -i NONE -l wezterm/tests/theme_sync.lua
 ```
+
+On macOS, new shells receive an empty `PROMPT_EOL_MARK` to suppress zsh’s
+standalone `%` marker during startup resizing. Partial command output is still
+preserved before the next prompt; this setting does not clear terminal output.

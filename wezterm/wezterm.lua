@@ -6,6 +6,9 @@ local config = wezterm.config_builder()
 if wezterm.target_triple:find('apple-darwin', 1, true) then
   config.set_environment_variables = {
     DYLD_INSERT_LIBRARIES = '',
+    -- Zsh's partial-line marker can be stranded by the first window resize.
+    -- An empty marker retains partial-line preservation without a stray %.
+    PROMPT_EOL_MARK = '',
   }
 end
 
