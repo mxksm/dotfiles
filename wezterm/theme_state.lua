@@ -5,6 +5,15 @@ local function state_path()
   return wezterm.config_dir .. '/.theme-state.json'
 end
 
+function M.preset_selected()
+  local file = io.open(state_path(), 'r')
+  if not file then return false end
+  local contents = file:read(65536)
+  file:close()
+  local ok, state = pcall(wezterm.json_parse, contents or '')
+  return ok and type(state) == 'table' and type(state.preset) == 'string'
+end
+
 function M.read(themes, fallback_name)
   local fallback = themes[fallback_name] or themes.monokai
   local file = io.open(state_path(), 'r')

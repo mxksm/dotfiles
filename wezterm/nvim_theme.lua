@@ -45,6 +45,9 @@ function M.apply(window, pane, value)
   local ok, payload = pcall(wezterm.json_parse, value or '')
   local colors = ok and type(payload) == 'table' and M.colors(payload.colors)
   if not colors then return end
+  -- An explicit terminal preset wins over startup/focus announcements. A real
+  -- editor palette change (including picker previews) resumes synchronization.
+  if payload.changed == false and require('theme_state').preset_selected() then return end
   local overrides = window:get_config_overrides() or {}
   local appearance = require('ui').tab_appearance(colors)
   overrides.colors = colors

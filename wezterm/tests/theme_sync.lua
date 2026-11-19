@@ -67,8 +67,43 @@ theme.apply(window, pane, '{bad json')
 theme.apply(window, pane, vim.json.encode { colors = { background = 'bad', foreground = '#ffffff' } })
 theme.apply(window, { pane_id = function() return 2 end }, vim.json.encode { colors = { background = '#ffffff', foreground = '#000000' } })
 assert(vim.deep_equal(before, overrides), 'malformed and inactive-pane events ignored')
-assert(state.write('catppuccin_latte'))
-assert(state.read(presets, 'monokai').background == presets.catppuccin_latte.background, 'favorite presets still work')
+-- Exercise the actual Option+number callbacks, followed by the focus events
+-- that used to immediately undo them. Keep unrelated zoom overrides intact.
+mock.action_callback = function(callback) return callback end
+mock.action = setmetatable({}, { __index = function(_, name)
+  return function(value) return { name = name, value = value } end
+end })
+local reloads = 0
+mock.reload_configuration = function() reloads = reloads + 1 end
+local favorites = { ['1'] = 'flexoki', ['2'] = 'monokai', ['3'] = 'slate',
+  ['4'] = 'tokyo_dracula', ['5'] = 'gray_5', ['8'] = 'gruvbox_light',
+  ['9'] = 'catppuccin_latte', ['0'] = 'white' }
+local tested = 0
+for _, binding in ipairs(require 'keys') do
+  local name = binding.mods == 'ALT' and favorites[binding.key]
+  if name then
+    binding.action(window, pane)
+    local expected = presets[name].background
+    assert(overrides.colors.background == expected, 'shortcut applies ' .. name)
+    vim.api.nvim_exec_autocmds('FocusGained', {})
+    vim.api.nvim_exec_autocmds('SafeState', {})
+    assert(overrides.colors.background == expected, 'focus preserves ' .. name)
+    assert(state.read(presets, 'monokai').background == expected, 'preset survives config reload')
+    assert(overrides.font_size == 19, 'shortcut preserves zoom')
+    tested = tested + 1
+  end
+end
+assert(tested == 8 and reloads == 8, 'all eight favorites exercised')
+local selected = overrides.colors.background
+package.loaded['configs.wezterm_theme'] = nil
+editor = require 'configs.wezterm_theme'
+editor.setup()
+editor.publish(true)
+assert(overrides.colors.background == selected and state.preset_selected(), 'editor restart preserves manual preset')
+send('#102030', '#eeeeee', 'SafeState')
+assert(not state.preset_selected(), 'actual editor theme change resumes sync')
+send('#eff1f5', '#4c4f69') -- preview after manual preset
+send('#102030', '#eeeeee') -- preview rollback still works
 vim.api.nvim_set_hl(0, 'Normal', { fg = '#ffffff' })
 assert(editor.palette() == nil, 'explicit transparency is respected')
 local handlers = {}

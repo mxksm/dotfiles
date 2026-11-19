@@ -8,8 +8,9 @@ Neovim exits. Active tabs use a subtle theme-colored background tint and full
 foreground color; inactive tabs use muted labels against the terminal background.
 
 The Option+number shortcuts still select the presets in `keys.lua`. They change
-the terminal palette, not Neovim’s selected theme. Neovim sends its palette again
-when its theme changes or it regains focus.
+the terminal palette, not Neovim’s selected theme. That choice survives focus
+changes and Neovim restarts. Changing the theme inside Neovim resumes syncing;
+simply returning to Neovim does not override a manually selected terminal preset.
 
 The theme picker starts in normal mode (`j`/`k` to preview, `i` to search).
 The empty part of Neovim’s buffer bar shares the editor background.
