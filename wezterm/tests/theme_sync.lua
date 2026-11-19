@@ -95,12 +95,16 @@ for _, binding in ipairs(require 'keys') do
   local name = binding.mods == 'ALT' and favorites[binding.key]
   if name then
     binding.action(window, pane)
+    local shortcut_tabs = vim.deepcopy(overrides.colors.tab_bar)
+    assert(shortcut_tabs.active_tab.bg_color ~= shortcut_tabs.background,
+      'shell shortcut shows active rectangle before any editor reply')
     local expected = presets[name].background:lower()
     local applied = vim.wait(2000, function() return editor_themes.selected() == names[binding.key]
       and overrides.colors.background == expected end)
     assert(applied, 'watcher applies ' .. name .. ' to both apps; got '
       .. editor_themes.selected() .. ' / ' .. overrides.colors.background)
     assert(require('nvconfig').base46.theme == names[binding.key], 'actual editor theme changed')
+    assert(vim.deep_equal(shortcut_tabs, overrides.colors.tab_bar), 'editor reply cannot change tab styling')
     assert(vim.deep_equal(overrides.colors.ansi, editor.palette().ansi), 'full editor ANSI palette synced')
     vim.api.nvim_exec_autocmds('FocusGained', {})
     vim.api.nvim_exec_autocmds('SafeState', {})

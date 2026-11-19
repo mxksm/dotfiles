@@ -1,4 +1,5 @@
 local wezterm = require 'wezterm'
+local tab_colors = require 'tab_colors'
 
 -- Separate from the terminal's font_size and Cmd +/- zoom.
 local TAB_FONT_SIZE = 12
@@ -73,19 +74,7 @@ local function mux_tab_title(tab)
 end
 
 local function tab_appearance(theme_colors)
-  local tab_bar_background = theme_colors.tab_bar.background
-  theme_colors.tab_bar.inactive_tab_edge = tab_bar_background
-  for _, state in ipairs {
-    'active_tab',
-    'inactive_tab',
-    'inactive_tab_hover',
-    'new_tab',
-    'new_tab_hover',
-  } do
-    if theme_colors.tab_bar[state] then
-      theme_colors.tab_bar[state].underline = 'None'
-    end
-  end
+  local tab_bar_background = theme_colors.background
 
   return {
     window_frame = {
@@ -101,6 +90,7 @@ local function tab_appearance(theme_colors)
 end
 
 local function apply(config)
+  config.colors = tab_colors.with_tabs(config.colors)
   config.font_size = 14.0
   config.font = wezterm.font 'JetBrains Mono'
   config.window_decorations = "RESIZE | MACOS_FORCE_SQUARE_CORNERS"
@@ -125,22 +115,35 @@ local function apply(config)
   config.background = {} -- Use colors.background, without a fixed opaque layer.
   config.window_frame = appearance.window_frame
 
-  -- Theme overrides survive config reloads. Refresh the tab font and remove
-  -- fixed background layers from existing windows too.
+  -- Compare just the fields we own: effective_config also includes WezTerm's
+  -- defaults. This repairs old overrides without creating a reload loop.
+  local function matches(actual, expected)
+    if type(expected) ~= 'table' then return actual == expected end
+    if type(actual) ~= 'table' then return false end
+    for key, value in pairs(expected) do
+      if not matches(actual[key], value) then return false end
+    end
+    return true
+  end
   wezterm.on('window-config-reloaded', function(window)
     local overrides = window:get_config_overrides() or {}
-    local tabs = overrides.colors and overrides.colors.tab_bar
-    local active, inactive = tabs and tabs.active_tab, tabs and tabs.inactive_tab
-    local indistinguishable = active and inactive
-      and active.bg_color == inactive.bg_color and active.fg_color == inactive.fg_color
-    if indistinguishable then
-      overrides.colors = require('nvim_theme').colors(overrides.colors) or overrides.colors
+    local effective = window:effective_config()
+    local expected = tab_colors.for_palette(effective.colors)
+    local repair_tabs = not matches(effective.colors.tab_bar, expected)
+    local appearance = tab_appearance(effective.colors).window_frame
+    local frame = overrides.window_frame or effective.window_frame or {}
+    local repair_frame = false
+    for key, value in pairs(appearance) do
+      if key ~= 'font' and frame[key] ~= value then repair_frame = true end
     end
-    if indistinguishable
-      or (overrides.window_frame and overrides.window_frame.font_size ~= TAB_FONT_SIZE)
+    if repair_tabs or repair_frame
       or (overrides.background and next(overrides.background)) then
-      local updated = tab_appearance(overrides.colors or window:effective_config().colors)
-      overrides.window_frame = updated.window_frame
+      if repair_tabs then
+        overrides.colors = overrides.colors or {}
+        overrides.colors.tab_bar = expected
+      end
+      overrides.window_frame = overrides.window_frame or {}
+      for key, value in pairs(appearance) do overrides.window_frame[key] = value end
       overrides.background = {}
       window:set_config_overrides(overrides)
     end
@@ -155,7 +158,7 @@ local function apply(config)
       table.insert(elements, { Attribute = { Intensity = 'Normal' } })
     end
 
-    local tabs = effective_config.colors.tab_bar
+    local tabs = tab_colors.for_palette(effective_config.colors)
     local state = tab.is_active and tabs.active_tab
       or (hover and tabs.inactive_tab_hover) or tabs.inactive_tab
     -- Fancy tabs derive their rounded outer fill from the first cell.

@@ -5,22 +5,12 @@ local function color(value)
   return type(value) == 'string' and value:match('^#%x%x%x%x%x%x$') ~= nil
 end
 
--- Mix the theme's own colors so both light and dark palettes remain coherent.
-local function blend(bg, fg, amount)
-  local channels = {}
-  for i = 2, 6, 2 do
-    local a, b = tonumber(bg:sub(i, i + 1), 16), tonumber(fg:sub(i, i + 1), 16)
-    channels[#channels + 1] = math.floor(a + (b - a) * amount + 0.5)
-  end
-  return string.format('#%02x%02x%02x', channels[1], channels[2], channels[3])
-end
-
 -- Accept only palette data, never arbitrary configuration from a terminal pane.
 function M.colors(value)
   if type(value) ~= 'table' or not color(value.background) or not color(value.foreground) then return nil end
   local bg, fg = value.background, value.foreground
   local colors = { background = bg, foreground = fg, cursor_bg = fg, cursor_fg = bg,
-    selection_bg = fg, selection_fg = bg, tab_bar = { background = bg, inactive_tab_edge = bg } }
+    selection_bg = fg, selection_fg = bg }
   for _, name in ipairs { 'ansi', 'brights' } do
     local list = value[name]
     if type(list) == 'table' and #list == 8 then
@@ -29,14 +19,7 @@ function M.colors(value)
       if valid then colors[name] = list end
     end
   end
-  colors.tab_bar.active_tab = { bg_color = blend(bg, fg, 0.14), fg_color = fg }
-  for _, state in ipairs { 'inactive_tab', 'new_tab' } do
-    colors.tab_bar[state] = { bg_color = bg, fg_color = blend(bg, fg, 0.65) }
-  end
-  for _, state in ipairs { 'inactive_tab_hover', 'new_tab_hover' } do
-    colors.tab_bar[state] = { bg_color = blend(bg, fg, 0.07), fg_color = fg }
-  end
-  return colors
+  return require('tab_colors').with_tabs(colors)
 end
 
 function M.apply(window, pane, value)

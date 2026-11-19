@@ -6,6 +6,9 @@ WezTerm, including the padding and tabs. Previewing a theme updates the terminal
 Escape restores the previous theme. The shell keeps the chosen palette after
 Neovim exits. Active tabs use a subtle theme-colored background tint and full
 foreground color; inactive tabs use muted labels against the terminal background.
+Presets, editor palettes, and saved themes share the same tab styling. Hover uses
+a softer tint than the active rectangle, and config reloads repair older tab
+overrides without changing terminal zoom, ANSI colors, or selection colors.
 
 The Option+number shortcuts select matching themes in WezTerm and local Neovim
 sessions: 1 Flexoki Dark, 2 Monokai Midnight, 3 Slate, 4 Tokyo Dracula, 5 Cocoa,
@@ -34,6 +37,7 @@ Run the integration regression check from the dotfiles root:
 
 ```sh
 NVIM_LOG_FILE=/tmp/wezterm-theme-test.log nvim --headless -u NONE -i NONE -l wezterm/tests/theme_sync.lua
+NVIM_LOG_FILE=/tmp/wezterm-tab-test.log nvim --headless -u NONE -i NONE -l wezterm/tests/tab_colors.lua
 ```
 
 On macOS, new shells receive an empty `PROMPT_EOL_MARK` to suppress zsh’s
