@@ -2,7 +2,16 @@
 local root = vim.fn.getcwd()
 local temp = vim.fn.tempname()
 vim.fn.mkdir(temp, 'p')
+vim.opt.rtp:prepend(root .. '/nvim')
+for _, path in ipairs(vim.fn.glob(vim.fn.stdpath('data') .. '/lazy/*', false, true)) do
+  vim.opt.rtp:append(path)
+end
+vim.env.XDG_STATE_HOME = temp .. '/state'
+vim.env.WEZTERM_THEME_REQUEST = temp .. '/.theme-request.json'
+vim.g.base46_cache = temp .. '/base46/'
 package.path = root .. '/wezterm/?.lua;' .. root .. '/nvim/lua/?.lua;' .. package.path
+local editor_themes = require 'configs.sioyek_themes'
+editor_themes.register()
 local mock = { config_dir = temp, json_parse = vim.json.decode, json_encode = vim.json.encode,
   font = function(name) return name end, log_error = function(message) error(message) end }
 package.loaded.wezterm = mock
@@ -78,13 +87,21 @@ mock.reload_configuration = function() reloads = reloads + 1 end
 local favorites = { ['1'] = 'flexoki', ['2'] = 'monokai', ['3'] = 'slate',
   ['4'] = 'tokyo_dracula', ['5'] = 'gray_5', ['8'] = 'gruvbox_light',
   ['9'] = 'catppuccin_latte', ['0'] = 'white' }
+local names = { ['1'] = 'Flexoki Dark', ['2'] = 'Monokai Midnight', ['3'] = 'Slate',
+  ['4'] = 'Tokyo Dracula', ['5'] = 'Cocoa', ['8'] = 'Gruvbox Light',
+  ['9'] = 'Catppuccin Latte', ['0'] = 'Paper White' }
 local tested = 0
 for _, binding in ipairs(require 'keys') do
   local name = binding.mods == 'ALT' and favorites[binding.key]
   if name then
     binding.action(window, pane)
-    local expected = presets[name].background
-    assert(overrides.colors.background == expected, 'shortcut applies ' .. name)
+    local expected = presets[name].background:lower()
+    local applied = vim.wait(2000, function() return editor_themes.selected() == names[binding.key]
+      and overrides.colors.background == expected end)
+    assert(applied, 'watcher applies ' .. name .. ' to both apps; got '
+      .. editor_themes.selected() .. ' / ' .. overrides.colors.background)
+    assert(require('nvconfig').base46.theme == names[binding.key], 'actual editor theme changed')
+    assert(vim.deep_equal(overrides.colors.ansi, editor.palette().ansi), 'full editor ANSI palette synced')
     vim.api.nvim_exec_autocmds('FocusGained', {})
     vim.api.nvim_exec_autocmds('SafeState', {})
     assert(overrides.colors.background == expected, 'focus preserves ' .. name)
@@ -99,11 +116,31 @@ package.loaded['configs.wezterm_theme'] = nil
 editor = require 'configs.wezterm_theme'
 editor.setup()
 editor.publish(true)
-assert(overrides.colors.background == selected and state.preset_selected(), 'editor restart preserves manual preset')
+assert(overrides.colors.background == selected, 'editor restart preserves shared choice')
 send('#102030', '#eeeeee', 'SafeState')
-assert(not state.preset_selected(), 'actual editor theme change resumes sync')
 send('#eff1f5', '#4c4f69') -- preview after manual preset
 send('#102030', '#eeeeee') -- preview rollback still works
+editor_themes.save('Graphite')
+editor.setup()
+assert(editor_themes.selected() == 'Graphite' and editor.palette().background == '#102030',
+  'consumed shortcut cannot undo a later editor choice on restart')
+-- A shortcut selected without a running editor is consumed at next startup.
+vim.api.nvim_exec_autocmds('VimLeavePre', {})
+assert(state.request_editor_theme('monokai'))
+editor.setup()
+assert(editor_themes.selected() == 'Monokai Midnight' and overrides.colors.background == '#100c0c',
+  'shell shortcut applies on next editor startup')
+local prior = messages
+assert(state.request_editor_theme('monokai'))
+assert(vim.wait(2000, function() return messages > prior end), 'reselecting same favorite still syncs')
+local valid_request = vim.fn.readfile(vim.env.WEZTERM_THEME_REQUEST)
+vim.fn.writefile({ '{bad json' }, vim.env.WEZTERM_THEME_REQUEST)
+vim.api.nvim_exec_autocmds('FocusGained', {})
+assert(editor_themes.selected() == 'Monokai Midnight', 'invalid request ignored')
+vim.fn.writefile({ vim.json.encode { id = 'unknown', preset = 'not-a-theme' } }, vim.env.WEZTERM_THEME_REQUEST)
+vim.api.nvim_exec_autocmds('FocusGained', {})
+assert(editor_themes.selected() == 'Monokai Midnight', 'unknown favorite ignored')
+vim.fn.writefile(valid_request, vim.env.WEZTERM_THEME_REQUEST)
 vim.api.nvim_set_hl(0, 'Normal', { fg = '#ffffff' })
 assert(editor.palette() == nil, 'explicit transparency is respected')
 local handlers = {}
@@ -121,5 +158,6 @@ assert(updates == 1 and overrides.colors.tab_bar.active_tab.bg_color ~= override
   'reload repairs existing identical tab overrides')
 handlers['window-config-reloaded'](window)
 assert(updates == 1, 'repair does not cause a reload loop')
+vim.api.nvim_exec_autocmds('VimLeavePre', {})
 vim.fn.delete(temp, 'rf')
-print('PASS: real Neovim events and OSC payloads, arbitrary/light/dark palettes, preview rollback, persistence, preset fallback, validation, unrelated overrides')
+print('PASS: eight shared shortcuts, real editor themes and file watcher, OSC sync, restart persistence, shell requests, preview rollback and validation')

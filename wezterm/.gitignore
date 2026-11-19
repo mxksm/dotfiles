@@ -1,2 +1,4 @@
 .theme-state.json
 .theme-state.json.tmp
+.theme-request.json
+.theme-request.json.tmp

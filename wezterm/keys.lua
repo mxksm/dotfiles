@@ -23,6 +23,7 @@ local function change_theme(theme_name)
     overrides.window_frame = appearance.window_frame
     window:set_config_overrides(overrides)
     wezterm.reload_configuration()
+    theme_state.request_editor_theme(theme_name)
   end)
 end
 
