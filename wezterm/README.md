@@ -43,3 +43,9 @@ NVIM_LOG_FILE=/tmp/wezterm-tab-test.log nvim --headless -u NONE -i NONE -l wezte
 On macOS, new shells receive an empty `PROMPT_EOL_MARK` to suppress zsh’s
 standalone `%` marker during startup resizing. Partial command output is still
 preserved before the next prompt; this setting does not clear terminal output.
+
+On macOS, shells start through `env -u DYLD_INSERT_LIBRARIES` so terminal
+commands do not inherit the UI tweak loader, even as an empty variable. This
+avoids passing an empty library path into applications launched with `open`.
+Open a new terminal tab after updating; in an existing shell, run
+`unset DYLD_INSERT_LIBRARIES` to apply the same cleanup immediately.

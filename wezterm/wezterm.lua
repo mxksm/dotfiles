@@ -5,9 +5,12 @@ config.set_environment_variables = {
 }
 
 -- Keep macOS UI tweak loaders (Ammonia/AppleSharpener) out of terminal
--- processes. This must be set before the shell starts, not in .zshrc.
+-- processes. Clear the inherited loader for the env launcher, then remove the
+-- variable entirely before starting zsh. An empty value must not leak to `open`:
+-- GUI launch-time injection can turn it into an empty library path and abort.
 if wezterm.target_triple:find('apple-darwin', 1, true) then
   config.set_environment_variables.DYLD_INSERT_LIBRARIES = ''
+  config.default_prog = { '/usr/bin/env', '-u', 'DYLD_INSERT_LIBRARIES', '/bin/zsh', '-l' }
   -- Zsh's partial-line marker can be stranded by the first window resize.
   -- An empty marker retains partial-line preservation without a stray %.
   config.set_environment_variables.PROMPT_EOL_MARK = ''
